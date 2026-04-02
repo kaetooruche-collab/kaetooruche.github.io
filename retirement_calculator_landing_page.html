@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hibarr — Rentenlücken-Rechner 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   TOKENS
+════════════════════════════════════════ */
+:root {
+  --green-dark:   #0A5C46;
+  --green-mid:    #1D9E75;
+  --green-light:  #E1F5EE;
+  --green-pale:   #F0FAF6;
+  --red-dark:     #7B1D1D;
+  --red-mid:      #C53030;
+  --red-light:    #FEF0F0;
+  --amber:        #D97706;
+  --ink:          #0F0F1A;
+  --ink-soft:     #4A4A6A;
+  --ink-faint:    #8A8AAA;
+  --border:       #E2E2EF;
+  --bg:           #F7F7F4;
+  --white:        #FFFFFF;
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    16px;
+  --radius-xl:    24px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ════════════════════════════════════════
+   NAV
+════════════════════════════════════════ */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
+
+.nav-mark {
+  width: 30px; height: 30px;
+  background: var(--ink);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-mark svg { width: 15px; height: 15px; fill: white; }
+
+.nav-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.nav-cta {
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-md);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+  display: none;
+}
+
+.nav-cta:hover { background: var(--green-dark); }
+
+/* ════════════════════════════════════════
+   HERO
+════════════════════════════════════════ */
+.hero {
+  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  padding: 5rem 2rem 6rem;
+  text-align: center;
+}
+
+/* Decorative background circles */
+.hero::before,
+.hero::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero::before {
+  width: 600px; height: 600px;
+  top: -200px; right: -150px;
+  background: radial-gradient(circle, rgba(29,158,117,0.15) 0%, transparent 70%);
+}
+
+.hero::after {
+  width: 400px; height: 400px;
+  bottom: -150px; left: -100px;
+  background: radial-gradient(circle, rgba(29,158,117,0.08) 0%, transparent 70%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(29,158,117,0.15);
+  border: 1px solid rgba(29,158,117,0.3);
+  color: #5DCAA5;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green-mid);
+  display: block;
+}
+
+.hero-headline {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 500;
+  color: var(--white);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.hero-headline em {
+  font-style: italic;
+  color: #5DCAA5;
+}
+
+.hero-sub {
+  font-size: 17px;
+  color: #9CA3AF;
+  line-height: 1.7;
+  max-width: 540px;
+  margin: 0 auto 2.25rem;
+  font-weight: 300;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-cta-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.btn-primary-hero {
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  padding: 15px 32px;
+  border-radius: var(--radius-md);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.15s, transform 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary-hero:hover {
+  background: #0F6E56;
+  transform: translateY(-1px);
+}
+
+.hero-note {
+  font-size: 12px;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hero-note::before {
+  content: '🔒';
+  font-size: 11px;
+}
+
+/* Stats bar */
+.stats-bar {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 3rem auto 0;
+  max-width: 580px;
+  overflow: hidden;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+
+.stat-item {
+  flex: 1;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+
+.stat-item:last-child { border-right: none; }
+
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6B7280;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+/* ════════════════════════════════════════
+   TRUST STRIP
+════════════════════════════════════════ */
+.trust-strip {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.trust-icon {
+  width: 18px; height: 18px;
+  color: var(--green-mid);
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════
+   PROBLEM SECTION
+════════════════════════════════════════ */
+.section {
+  padding: 5rem 2rem;
+}
+
+.section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--green-mid);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  max-width: 600px;
+  font-weight: 300;
+}
+
+/* Three-column problem cards */
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 3rem;
+}
+
+.problem-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.problem-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--red-mid);
+  border-radius: 3px 3px 0 0;
+}
+
+.problem-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 42px;
+  font-weight: 500;
+  color: var(--red-mid);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.problem-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.problem-desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* ════════════════════════════════════════
+   CALCULATOR SECTION
+════════════════════════════════════════ */
+.calc-section {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5rem 2rem;
+}
+
+.calc-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.calc-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+/* Calculator Card (inlined from previous file) */
+.calc-card {
+  background: var(--white);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(15,15,26,0.08), 0 0 0 1px rgba(15,15,26,0.03);
+  padding: 2rem 2rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.calc-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--green-mid) 0%, #5DCAA5 100%);
+}
+
+/* ── Brand inside card ── */
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 1.75rem; }
+.brand-mark { width: 32px; height: 32px; background: var(--ink); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand-mark svg { width: 16px; height: 16px; fill: white; }
+.brand-text .bname { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; }
+.brand-text .bsub { font-size: 11px; color: var(--ink-faint); letter-spacing: 0.03em; text-transform: uppercase; margin-top: 1px; }
+
+/* Progress */
+.progress-bar { display: flex; gap: 5px; margin-bottom: 2rem; }
+.prog-seg { height: 2px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.4s ease; }
+.prog-seg.active { background: var(--green-mid); }
+
+/* Steps */
+.step { display: none; }
+.step.active { display: block; }
+.step-eyebrow { font-size: 11px; font-weight: 500; color: var(--green-mid); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.step-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 500; color: var(--ink); line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 6px; }
+.step-sub { font-size: 14px; color: var(--ink-soft); line-height: 1.65; margin-bottom: 1.75rem; }
+
+/* Fields */
+.field { margin-bottom: 1.4rem; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 8px; letter-spacing: 0.01em; }
+.slider-row { display: flex; align-items: center; gap: 12px; }
+.slider-row input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 4px; background: var(--border); outline: none; cursor: pointer; }
+.slider-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--white); border: 2px solid var(--green-mid); box-shadow: 0 1px 4px rgba(0,0,0,0.12); cursor: pointer; }
+.slider-row input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--white); border: 2px solid var(--green-mid); box-shadow: 0 1px 4px rgba(0,0,0,0.12); cursor: pointer; border: 2px solid var(--green-mid); }
+.slider-val { font-size: 15px; font-weight: 500; color: var(--ink); min-width: 110px; text-align: right; font-variant-numeric: tabular-nums; }
+.hint { font-size: 12px; color: var(--ink-faint); font-style: italic; margin-top: 5px; line-height: 1.5; }
+
+/* Buttons */
+.btn-row { display: flex; gap: 10px; margin-top: 2rem; }
+.btn { padding: 11px 22px; border-radius: var(--radius-md); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--white); color: var(--ink-soft); transition: all 0.15s ease; letter-spacing: 0.01em; }
+.btn:hover { background: var(--bg); }
+.btn.primary { background: var(--ink); color: var(--white); border-color: var(--ink); flex: 1; }
+.btn.primary:hover { background: #2a2a4a; }
+
+/* Results */
+.verdict { border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; border: 1px solid; }
+.verdict.schlecht { background: var(--red-light); border-color: #FCA5A5; }
+.verdict.gut { background: var(--green-light); border-color: #6EE7B7; }
+.verdict-head { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; line-height: 1.35; margin-bottom: 8px; }
+.verdict.schlecht .verdict-head { color: var(--red-dark); }
+.verdict.gut .verdict-head { color: var(--green-dark); }
+.verdict-body { font-size: 14px; line-height: 1.7; }
+.verdict.schlecht .verdict-body { color: #7F1D1D; }
+.verdict.gut .verdict-body { color: #065F46; }
+
+.luecke-callout { display: flex; align-items: center; gap: 14px; background: var(--red-light); border: 1px solid #FCA5A5; border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-top: 12px; }
+.luecke-zahl { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: var(--red-mid); white-space: nowrap; letter-spacing: -0.03em; }
+.luecke-text { font-size: 13px; color: #7F1D1D; line-height: 1.55; }
+
+.balken-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+.balken-zeile { margin-bottom: 12px; }
+.balken-zeile:last-child { margin-bottom: 0; }
+.balken-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-bottom: 5px; }
+.balken-labels span:last-child { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.balken-track { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.balken-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+.balken-fill.gruen { background: var(--green-mid); }
+.balken-fill.rot { background: var(--red-mid); }
+.balken-fill.amber { background: var(--amber); }
+
+.kennzahlen-titel { font-size: 11px; font-weight: 500; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; margin: 1.5rem 0 0.75rem; }
+.kennzahlen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+.kenn-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem 1rem; }
+.kenn-label { font-size: 12px; color: var(--ink-soft); line-height: 1.4; margin-bottom: 5px; }
+.kenn-wert { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--ink); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.kenn-wert.rot { color: var(--red-mid); }
+.kenn-wert.gruen { color: var(--green-dark); }
+.kenn-sub { font-size: 11px; color: var(--ink-faint); margin-top: 3px; line-height: 1.4; }
+
+.loesung-box { border-left: 3px solid var(--green-mid); padding: 0.9rem 1.1rem; background: var(--green-pale); border-radius: 0 var(--radius-md) var(--radius-md) 0; margin: 1.25rem 0; }
+.loesung-box p { font-size: 14px; color: #065F46; line-height: 1.7; }
+
+.cta-box { background: var(--ink); border-radius: var(--radius-lg); padding: 1.75rem; margin-top: 1.25rem; text-align: center; position: relative; overflow: hidden; }
+.cta-box::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(29,158,117,0.12); }
+.cta-box h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; color: var(--white); margin-bottom: 8px; position: relative; letter-spacing: -0.02em; line-height: 1.3; }
+.cta-box p { font-size: 14px; color: #9CA3AF; margin-bottom: 1.5rem; line-height: 1.65; position: relative; }
+.cta-btn { display: inline-block; background: var(--green-mid); color: var(--white); padding: 13px 30px; border-radius: var(--radius-md); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; border: none; position: relative; transition: background 0.15s; letter-spacing: 0.01em; }
+.cta-btn:hover { background: #0F6E56; }
+
+.neuberechnen { font-size: 13px; color: var(--ink-faint); text-align: center; margin-top: 1.25rem; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; transition: color 0.15s; }
+.neuberechnen:hover { color: var(--ink-soft); }
+
+/* ════════════════════════════════════════
+   HOW IT WORKS
+════════════════════════════════════════ */
+.how-section {
+  padding: 5rem 2rem;
+  background: var(--bg);
+}
+
+.steps-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  position: relative;
+}
+
+.how-step {
+  text-align: center;
+}
+
+.how-num {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 auto 1rem;
+}
+
+.how-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.how-desc {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* ════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════ */
+footer {
+  background: var(--ink);
+  padding: 2.5rem 2rem;
+  text-align: center;
+}
+
+.footer-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: white;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.footer-note {
+  font-size: 12px;
+  color: #4B5563;
+  line-height: 1.7;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════
+   ANIMATIONS
+════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media (max-width: 600px) {
+  nav { padding: 0 1rem; }
+  .hero { padding: 3.5rem 1.25rem 4rem; }
+  .section { padding: 3.5rem 1.25rem; }
+  .calc-section { padding: 3.5rem 1.25rem; }
+  .how-section { padding: 3.5rem 1.25rem; }
+  .calc-card { padding: 1.5rem 1.25rem 2rem; }
+  .stats-bar { flex-direction: column; gap: 0; }
+  .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  .stat-item:last-child { border-bottom: none; }
+  .trust-strip { gap: 1rem; }
+  .kennzahlen-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Nav ── -->
+<nav>
+  <a href="#" class="nav-brand">
+    <div class="nav-mark">
+      <svg viewBox="0 0 16 16"><path d="M8 2L2 6v8h4v-4h4v4h4V6z"/></svg>
+    </div>
+    <span class="nav-name">Hibarr</span>
+  </a>
+  <a href="#rechner" class="nav-cta" id="nav-cta-btn" style="display:block;">Jetzt berechnen</a>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Für den deutschen Ruhestand 2026</div>
+    <h1 class="hero-headline">
+      Sagt Ihnen Ihre<br>
+      <em>Renteninformation</em><br>
+      die ganze Wahrheit?
+    </h1>
+    <p class="hero-sub">
+      Die meisten deutschen Rentenbescheide zeigen einen Bruttobetrag, der auf dem Papier akzeptabel aussieht. Nach Steuern, Krankenversicherung und Inflation bleibt oft erschreckend wenig übrig.
+    </p>
+    <div class="hero-cta-group">
+      <a href="#rechner" class="btn-primary-hero">Meine persönliche Rentenlücke berechnen →</a>
+      <span class="hero-note">60 Sekunden · keine persönlichen Daten erforderlich</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num">~57 %</div>
+        <div class="stat-label">der Deutschen 55+ haben eine Versorgungslücke</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">–18 %</div>
+        <div class="stat-label">Abzüge auf die Bruttorente im Durchschnitt</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">20+ J.</div>
+        <div class="stat-label">durchschnittliche Rentendauer in Deutschland</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Trust strip ── -->
+<div class="trust-strip">
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"/></svg>
+    Keine Datenspeicherung
+  </div>
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+    Anonym & kostenlos
+  </div>
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zM6 8a2 2 0 11-4 0 2 2 0 014 0zM1.49 15.326a.78.78 0 01-.358-.442 3 3 0 014.308-3.516 6.484 6.484 0 00-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 01-2.07-.655zM16.44 15.98a4.97 4.97 0 002.07-.654.78.78 0 00.357-.442 3 3 0 00-4.308-3.517 6.484 6.484 0 011.907 3.96 2.32 2.32 0 01-.026.654zM18 8a2 2 0 11-4 0 2 2 0 014 0zM5.304 16.19a.844.844 0 01-.277-.71 5 5 0 019.947 0 .843.843 0 01-.277.71A6.975 6.975 0 0110 18a6.974 6.974 0 01-4.696-1.81z"/></svg>
+    Speziell für 50–75-Jährige
+  </div>
+  <div class="trust-item">
+    <svg class="trust-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd"/></svg>
+    Ergebnis in 60 Sekunden
+  </div>
+</div>
+
+<!-- ── Problem section ── -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-eyebrow">Das Problem</div>
+    <h2 class="section-title">Drei Faktoren, die Ihre Rente still erodieren</h2>
+    <p class="section-sub">Die meisten Deutschen unterschätzen systematisch, wie viel von ihrer Bruttorente tatsächlich zum Leben bleibt.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-num">–14 %</div>
+        <div class="problem-label">Kranken- & Pflegeversicherung</div>
+        <div class="problem-desc">Rentner zahlen den vollen Beitragssatz — ein stiller Abzug, den kaum jemand einplant.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">–4 %</div>
+        <div class="problem-label">Einkommensteuer</div>
+        <div class="problem-desc">Bis 2040 werden 100 % der Rente steuerpflichtig sein. Wer heute plant, muss das einrechnen.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">–30 %</div>
+        <div class="problem-label">Kaufkraftverlust durch Inflation</div>
+        <div class="problem-desc">Bei 2 % Inflation über 20 Jahre verliert jeder Euro fast ein Drittel seiner Kaufkraft.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Calculator section ── -->
+<section class="calc-section" id="rechner">
+  <div class="calc-inner">
+    <div class="calc-header">
+      <div class="section-eyebrow" style="text-align:center;">Der Rechner</div>
+      <h2 class="section-title" style="text-align:center;">Berechnen Sie Ihre persönliche Rentenlücke</h2>
+      <p class="section-sub" style="margin: 0 auto; text-align:center;">Geben Sie Ihre Zahlen ein — Ihr Ergebnis erscheint sofort. Keine Registrierung, keine E-Mail.</p>
+    </div>
+
+    <!-- ══ CALCULATOR CARD ══ -->
+    <div class="calc-card">
+
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 16 16"><path d="M8 2L2 6v8h4v-4h4v4h4V6z"/></svg>
+        </div>
+        <div class="brand-text">
+          <div class="bname">Hibarr</div>
+          <div class="bsub">Rentenlücken-Rechner</div>
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="prog-seg active" id="p1"></div>
+        <div class="prog-seg" id="p2"></div>
+        <div class="prog-seg" id="p3"></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step active" id="step1">
+        <div class="step-eyebrow">Schritt 1 von 2 — Ihre Angaben</div>
+        <div class="step-title">Über Ihre persönliche Situation</div>
+        <div class="step-sub">Alle Angaben sind anonym und werden nicht gespeichert oder weitergegeben.</div>
+
+        <div class="field">
+          <label>Ihr aktuelles Alter</label>
+          <div class="slider-row">
+            <input type="range" id="alter" min="45" max="74" value="57" step="1"
+              oninput="syncSlider(this,'alter-val', function(v){ return v+' Jahre'; })">
+            <span class="slider-val" id="alter-val">57 Jahre</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Geplantes Renteneintrittsalter</label>
+          <div class="slider-row">
+            <input type="range" id="rentenalter" min="60" max="70" value="65" step="1"
+              oninput="syncSlider(this,'rente-val', function(v){ return v+' Jahre'; })">
+            <span class="slider-val" id="rente-val">65 Jahre</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Aktuelles monatliches Nettoeinkommen</label>
+          <div class="slider-row">
+            <input type="range" id="einkommen" min="1500" max="8000" value="3200" step="100"
+              oninput="syncSlider(this,'eink-val', fmtEuro)">
+            <span class="slider-val" id="eink-val">3.200\u202F€</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Gewünschter monatlicher Lebensstandard im Ruhestand</label>
+          <div class="slider-row">
+            <input type="range" id="lebensstandard" min="1200" max="6000" value="2500" step="100"
+              oninput="syncSlider(this,'leben-val', fmtEuro)">
+            <span class="slider-val" id="leben-val">2.500\u202F€</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn primary" onclick="goStep(2)">Weiter →</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step" id="step2">
+        <div class="step-eyebrow">Schritt 2 von 2 — Ihre Rentenangaben</div>
+        <div class="step-title">Rente &amp; Ersparnisse</div>
+        <div class="step-sub">Den erwarteten Rentenbetrag finden Sie in Ihrer jährlichen <strong>Renteninformation</strong> der Deutschen Rentenversicherung.</div>
+
+        <div class="field">
+          <label>Erwartete monatliche Bruttorente (laut Renteninformation)</label>
+          <div class="slider-row">
+            <input type="range" id="rente" min="400" max="3000" value="1200" step="50"
+              oninput="syncSlider(this,'rente-brutto-val', fmtEuro)">
+            <span class="slider-val" id="rente-brutto-val">1.200\u202F€</span>
+          </div>
+          <div class="hint">Nicht sicher? Die durchschnittliche Bruttorente in Deutschland liegt bei ca. 1.200–1.400 €/Monat.</div>
+        </div>
+
+        <div class="field">
+          <label>Gesamte Ersparnisse &amp; Vermögenswerte (Gegenwartswert)</label>
+          <div class="slider-row">
+            <input type="range" id="ersparnisse" min="0" max="600000" value="80000" step="5000"
+              oninput="syncSlider(this,'erspar-val', fmtEuro)">
+            <span class="slider-val" id="erspar-val">80.000\u202F€</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" onclick="goStep(1)">← Zurück</button>
+          <button class="btn primary" onclick="goStep(3)">Ergebnis berechnen →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Results -->
+      <div class="step" id="step3">
+        <div class="step-eyebrow">Ihr persönliches Ergebnis</div>
+        <div id="urteil-bereich"></div>
+        <div id="balken-bereich"></div>
+        <div id="kennzahlen-bereich"></div>
+        <div id="loesung-bereich"></div>
+        <div id="cta-bereich"></div>
+        <div class="neuberechnen" onclick="goStep(1)">Mit anderen Werten neu berechnen</div>
+      </div>
+
+    </div><!-- /calc-card -->
+  </div>
+</section>
+
+<!-- ── How it works ── -->
+<section class="how-section">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-eyebrow">So funktioniert es</div>
+    <h2 class="section-title">Von der Lücke zur Lösung</h2>
+
+    <div class="steps-row">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">Zahlen eingeben</div>
+        <div class="how-desc">Ihr Alter, Renteninformation und gewünschter Lebensstandard. Dauert 60 Sekunden.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">Lücke verstehen</div>
+        <div class="how-desc">Der Rechner zeigt Ihre monatliche Versorgungslücke und was das über 20+ Jahre bedeutet.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">Kostenfrei beraten lassen</div>
+        <div class="how-desc">Ein Hibarr-Berater zeigt Ihnen konkrete, legale Wege, die Lücke zu schließen — ohne Druck.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="footer-brand">Hibarr</div>
+  <p class="footer-note">
+    Dieser Rechner dient ausschließlich zu Informationszwecken und stellt keine individuelle Finanzberatung dar. Die Ergebnisse basieren auf vereinfachten Annahmen. Bitte konsultieren Sie einen zugelassenen Finanzberater für persönliche Empfehlungen.
+  </p>
+</footer>
+
+<script>
+/* ── German number formatter ── */
+function fmtEuro(n) {
+  return Math.round(n).toLocaleString('de-DE') + '\u202F\u20AC';
+}
+
+/* ── Sync slider display + fill gradient ── */
+function syncSlider(el, displayId, formatter) {
+  document.getElementById(displayId).textContent = formatter(el.value);
+  updateSliderGradient(el);
+}
+
+function updateSliderGradient(el) {
+  var min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
+  var pct = ((val - min) / (max - min)) * 100;
+  el.style.background = 'linear-gradient(to right, #1D9E75 0%, #1D9E75 ' + pct + '%, #E2E2EF ' + pct + '%, #E2E2EF 100%)';
+}
+
+window.addEventListener('load', function() {
+  document.querySelectorAll('input[type=range]').forEach(updateSliderGradient);
+});
+
+/* ── Step navigation ── */
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
+  document.getElementById('step' + n).classList.add('active');
+  [1, 2, 3].forEach(function(i) {
+    var d = document.getElementById('p' + i);
+    if (d) d.classList.toggle('active', i <= n);
+  });
+  if (n === 3) berechneErgebnis();
+  document.getElementById('rechner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ── Core calculation ── */
+function berechneErgebnis() {
+  var alter          = parseInt(document.getElementById('alter').value);
+  var rentenalter    = parseInt(document.getElementById('rentenalter').value);
+  var renteGross     = parseInt(document.getElementById('rente').value);
+  var ersparnisse    = parseInt(document.getElementById('ersparnisse').value);
+  var lebensstandard = parseInt(document.getElementById('lebensstandard').value);
+
+  var renteNetto   = Math.round(renteGross * 0.82);
+  var luecke       = lebensstandard - renteNetto;
+  var jahreRente   = Math.max(1, 85 - rentenalter);
+  var jahreBis     = Math.max(0, rentenalter - alter);
+  var gesamtLuecke = Math.max(0, luecke) * 12 * jahreRente;
+
+  var deckungsJahre        = luecke > 0 ? Math.floor(ersparnisse / luecke / 12) : 9999;
+  var ersparnisseLeer      = luecke > 0 && deckungsJahre < jahreRente;
+  var ungedeckteJahre      = Math.max(0, jahreRente - deckungsJahre);
+
+  var urteilEl   = document.getElementById('urteil-bereich');
+  var balkenEl   = document.getElementById('balken-bereich');
+  var kennEl     = document.getElementById('kennzahlen-bereich');
+  var loesungEl  = document.getElementById('loesung-bereich');
+  var ctaEl      = document.getElementById('cta-bereich');
+
+  if (luecke <= 0) {
+    urteilEl.innerHTML =
+      '<div class="verdict gut">'
+      + '<div class="verdict-head">Gute Nachricht — Ihre Rente deckt Ihren Lebensstandard.</div>'
+      + '<div class="verdict-body">Laut Ihren Angaben reicht Ihre gesetzliche Nettorente von <strong>' + fmtEuro(renteNetto) + '/Monat</strong>, um den gewünschten Ruhestand zu finanzieren. Das stellt Sie besser als die Mehrheit der Deutschen Ihres Alters.<br><br>Ihr Vermögen ist jedoch vollständig im EU-Raum gebunden — exponiert gegenüber regulatorischen Veränderungen, Kapitalkontrollen und historisch niedrigen Sparrenditen. Viele Menschen in Ihrer Lage nutzen internationale Optionen, um das Aufgebaute zu schützen und zu vermehren.</div>'
+      + '</div>';
+
+    balkenEl.innerHTML =
+      '<div class="balken-box">'
+      + '<div class="balken-zeile"><div class="balken-labels"><span>Nettorente (staatlich)</span><span>' + fmtEuro(renteNetto) + '/Mo.</span></div><div class="balken-track"><div class="balken-fill gruen" style="width:100%"></div></div></div>'
+      + '<div class="balken-zeile"><div class="balken-labels"><span>Gewünschter Lebensstandard</span><span>' + fmtEuro(lebensstandard) + '/Mo.</span></div><div class="balken-track"><div class="balken-fill amber" style="width:' + Math.min(100, Math.round(lebensstandard / renteNetto * 100)) + '%"></div></div></div>'
+      + '</div>';
+
+    kennEl.innerHTML =
+      '<div class="kennzahlen-titel">Ihre Eckdaten auf einen Blick</div>'
+      + '<div class="kennzahlen-grid">'
+      + '<div class="kenn-card"><div class="kenn-label">Monatlicher Überschuss</div><div class="kenn-wert gruen">' + fmtEuro(Math.abs(luecke)) + '</div><div class="kenn-sub">über dem gewünschten Lebensstandard</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Geschätzte Rentendauer</div><div class="kenn-wert">' + jahreRente + ' Jahre</div><div class="kenn-sub">Alter ' + rentenalter + ' bis 85</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Verbleibende Planungszeit</div><div class="kenn-wert gruen">' + jahreBis + ' Jahre</div><div class="kenn-sub">bis zur Rente</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Verfügbares Vermögen</div><div class="kenn-wert">' + fmtEuro(ersparnisse) + '</div><div class="kenn-sub">aktueller Gegenwartswert</div></div>'
+      + '</div>';
+
+    loesungEl.innerHTML =
+      '<div class="loesung-box"><p>Auch mit einem Überschuss besteht das Risiko, dass EU-Regulierungen, Inflation oder Gesetzesänderungen Ihre Position langfristig erodieren. Auslandskonten und internationale Immobilieninvestments — etwa in Wachstumsmärkten wie Nordzypern — bieten Renditen und Absicherung, die innerhalb des deutschen Finanzsystems schlicht nicht verfügbar sind.</p></div>';
+
+    ctaEl.innerHTML =
+      '<div class="cta-box"><h3>Schützen Sie, was Sie aufgebaut haben</h3><p>Sprechen Sie kostenlos mit einem Hibarr-Berater und erfahren Sie, wie Sie Ihr Rentenvermögen jenseits der EU-Grenzen schützen und mehren können — unverbindlich und ohne Verkaufsdruck.</p><button class="cta-btn" onclick="window.location.href=\'#\'">Kostenlose Beratung vereinbaren ↗</button></div>';
+
+  } else {
+    var erspMsg;
+    if (deckungsJahre >= jahreRente) {
+      erspMsg = 'Ihre Ersparnisse von ' + fmtEuro(ersparnisse) + ' könnten diese Lücke über die gesamte Rentenzeit decken.';
+    } else if (ersparnisseLeer && deckungsJahre === 0) {
+      erspMsg = 'Ihre Ersparnisse von ' + fmtEuro(ersparnisse) + ' wären in weniger als einem Jahr aufgebraucht.';
+    } else {
+      erspMsg = 'Ihre Ersparnisse von ' + fmtEuro(ersparnisse) + ' wären nach nur ' + deckungsJahre + ' Jahr' + (deckungsJahre !== 1 ? 'en' : '') + ' erschöpft — weitere ' + ungedeckteJahre + ' Jahre ohne Puffer.';
+    }
+
+    urteilEl.innerHTML =
+      '<div class="verdict schlecht">'
+      + '<div class="verdict-head">Ihre Rente wird nicht ausreichen, um Ihren Lebensstandard zu halten.</div>'
+      + '<div class="verdict-body">Wenn Sie in Rente gehen, zahlt der deutsche Staat Ihnen voraussichtlich ca. <strong>' + fmtEuro(renteNetto) + ' pro Monat</strong> netto. Sie haben angegeben, dass Sie <strong>' + fmtEuro(lebensstandard) + ' pro Monat</strong> für ein komfortables Leben benötigen. Das ergibt ein monatliches Defizit von <strong>' + fmtEuro(luecke) + '</strong> — Geld, das Sie jeden Monat, für den Rest Ihres Lebens, aus eigenen Mitteln aufbringen müssen.<br><br>' + erspMsg + '</div>'
+      + '</div>';
+
+    var deckPct = Math.round(renteNetto / lebensstandard * 100);
+    balkenEl.innerHTML =
+      '<div class="balken-box">'
+      + '<div class="balken-zeile"><div class="balken-labels"><span>Staatliche Nettorente</span><span>' + fmtEuro(renteNetto) + '/Mo.</span></div><div class="balken-track"><div class="balken-fill gruen" style="width:' + deckPct + '%"></div></div></div>'
+      + '<div class="balken-zeile"><div class="balken-labels"><span>Benötigter Lebensstandard</span><span>' + fmtEuro(lebensstandard) + '/Mo.</span></div><div class="balken-track"><div class="balken-fill rot" style="width:100%"></div></div></div>'
+      + '<div class="luecke-callout"><div class="luecke-zahl">–' + fmtEuro(luecke) + '</div><div class="luecke-text">monatliche Versorgungslücke — der Staat schließt diese Lücke nicht für Sie</div></div>'
+      + '</div>';
+
+    kennEl.innerHTML =
+      '<div class="kennzahlen-titel">Was das über Ihre gesamte Rentenzeit bedeutet</div>'
+      + '<div class="kennzahlen-grid">'
+      + '<div class="kenn-card"><div class="kenn-label">Gesamte Versorgungslücke über die Rentenzeit</div><div class="kenn-wert rot">' + fmtEuro(gesamtLuecke) + '</div><div class="kenn-sub">über ~' + jahreRente + ' Jahre</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Ersparnisse reichen für</div><div class="kenn-wert ' + (deckungsJahre < 5 ? 'rot' : '') + '">' + (deckungsJahre === 0 ? '&lt;\u20091 Jahr' : deckungsJahre + ' Jahre') + '</div><div class="kenn-sub">' + (ersparnisseLeer ? ungedeckteJahre + ' Jahre ohne Absicherung' : 'deckt gesamte Rentenzeit') + '</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Verbleibende Zeit zum Handeln</div><div class="kenn-wert">' + jahreBis + ' Jahre</div><div class="kenn-sub">bis zur Rente mit ' + rentenalter + '</div></div>'
+      + '<div class="kenn-card"><div class="kenn-label">Rentendeckungsgrad</div><div class="kenn-wert rot">' + deckPct + '\u202F%</div><div class="kenn-sub">des benötigten monatlichen Bedarfs</div></div>'
+      + '</div>';
+
+    loesungEl.innerHTML =
+      '<div class="loesung-box"><p>Das ist keine Ausnahme — Millionen Deutschen droht dieselbe Versorgungslücke. Entscheidend ist, was Sie jetzt tun. Wer die Lücke schließt, nutzt typischerweise zwei Wege: <strong>Auslandskonten</strong> mit deutlich höheren Renditen als alles, was das deutsche Bankensystem bietet, und <strong>Immobilieninvestments in Wachstumsmärkten wie Nordzypern</strong> — wo Renditen von 8–12\u202F% p.a. noch realisierbar sind. Beide Wege sind legal, erprobt und innerhalb weniger Wochen umsetzbar.</p></div>';
+
+    ctaEl.innerHTML =
+      '<div class="cta-box"><h3>Sie haben ' + jahreBis + ' Jahre, um eine Lücke von ' + fmtEuro(gesamtLuecke) + ' zu schließen</h3><p>Ein kostenfreies 30-Minuten-Gespräch mit einem Hibarr-Berater zeigt Ihnen genau, was in Ihrer konkreten Situation möglich ist — klar, ohne Fachjargon, ohne Druck.</p><button class="cta-btn" onclick="window.location.href=\'#\'">Jetzt kostenfrei beraten lassen ↗</button></div>';
+  }
+
+  /* Animate bars */
+  setTimeout(function() {
+    document.querySelectorAll('.balken-fill').forEach(function(b) {
+      var w = b.style.width; b.style.width = '0%';
+      setTimeout(function(){ b.style.width = w; }, 60);
+    });
+  }, 80);
+}
+</script>
+</body>
+</html>
